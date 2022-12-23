@@ -4,6 +4,7 @@ import "./App.css";
 function App() {
   const [email, setEmail] = useState<string>("");
   const [disable, setDisable] = useState(true);
+  const [nickel, setNickel] = useState(false);
   const [error, setError] = useState("");
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -29,7 +30,16 @@ function App() {
       console.log(data);
       fetch(
         `https://us-central1-celtic-science-372409.cloudfunctions.net/Test-1?data=${data}`
-      ).then((res: any) => console.log(res));
+      )
+        .then((res: any) => {
+          if (res.ok) {
+            setNickel(true);
+            console.log(res);
+          } else {
+            setError("Ups il y a eu un problème 🤯");
+          }
+        })
+        .catch(() => setError("Ups il y a eu un problème 🤯"));
     } else {
       setError("Email non valide !");
     }
@@ -38,10 +48,23 @@ function App() {
     <div className="App">
       <h1>Tape ton email 😄</h1>
       <input type="email" value={email} onChange={handleChange} /> <br />
-      <button disabled={disable} type="button" onClick={() => sendEmail(email)}>
-        Envoyer
-      </button>
-      <p style={{ position: "absolute", marginTop: "300px" }}>{error}</p>
+      {!nickel ? (
+        <button
+          disabled={disable}
+          type="button"
+          onClick={() => {
+            setError("");
+            sendEmail(email);
+          }}
+        >
+          Envoyer
+        </button>
+      ) : (
+        <p>Message envoyé ! 😊</p>
+      )}
+      <p style={{ position: "absolute", marginTop: "300px", color: "red" }}>
+        {error}
+      </p>
     </div>
   );
 }
